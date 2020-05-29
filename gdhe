@@ -45,7 +45,7 @@ def add_word_list(index):
     with open('history', 'w') as f:
         f.writelines(history)
     
-    os.system('cp history ~/.goldendict/history')
+    os.system('mv history ~/.goldendict/history')
             
 
 def update():
