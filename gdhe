@@ -1,0 +1,79 @@
+#!/usr/bin/python3
+
+# GoldenDict History Enhancer
+
+import random, json, os
+def generate_daily_word_list():
+    with open('voclist.txt') as f:
+        lines = f.readlines()
+        lines = [line.rstrip('\n') for line in lines]
+
+    N = 24
+    word_count = len(lines)
+    random.shuffle(lines)
+
+    daily_lens = [N for _ in range(word_count // N)]
+    daily_lens.append(len(lines) - len(daily_lens) * N)
+
+    daily_words = [lines[day * N: day * N + daily_len] for day, daily_len in enumerate(daily_lens)]
+
+    with open('daily_words.json', 'w') as f:
+        json.dump(daily_words, f)
+
+def current_history():
+    os.system('cp ~/.goldendict/history history')
+    with open('history') as f:
+        lines = f.readlines()
+    return lines
+
+def add_word_list(index):
+    with open('daily_words.json') as f:
+        daily_words = json.load(f)
+    
+    today_words = daily_words[index]
+    print("Current index: {}. Total: {}.".format(index, len(daily_words)))
+
+    today_list = ['1 {}\n'.format(word) for word in today_words]
+
+    history = current_history()
+    for word in today_list:
+        if word not in history:
+            history.insert(0, word)
+
+    os.system('killall goldendict')
+    os.system('cp ~/.goldendict/history ~/.goldendict/history.bak')
+    with open('history', 'w') as f:
+        f.writelines(history)
+    
+    os.system('cp history ~/.goldendict/history')
+            
+
+def update():
+    with open('index.json', 'r') as f:
+        index = json.load(f)
+    
+    with open('index.json', 'w') as f:
+        index += 1
+        add_word_list(index)
+        json.dump(index, f)
+
+def undo():
+    os.system('killall goldendict')
+    os.system('mv ~/.goldendict/history.bak ~/.goldendict/history')
+    with open('index.json', 'r') as f:
+        index = json.load(f)
+    with open('index.json', 'w') as f:
+        index -= 1
+        json.dump(index, f)
+
+
+if __name__ == '__main__':
+    s = input("Update GoldenDict history list? [Y/N] ")
+    if s in 'Yy':
+        update()
+        print("Done!")
+    if s in 'Nn':
+        s = input('Undo last update? [Y/N] ')
+        if s in 'Yy':
+            undo()
+            print("Done!")
