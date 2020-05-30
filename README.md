@@ -8,6 +8,8 @@ This Python program is developed on Arch Linux and is compatible with Unix machi
 
 ### Initialization
 
+*You may want to delete the `json` files before first usage.*
+
 1. Add your word list to `voclist.txt`. One word (or phrase) per line. The example `voclist.txt` is a GRE vocabulary list.
 
 2. Run `python3 gdhe` and follow the instructions.
