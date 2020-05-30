@@ -2,13 +2,20 @@
 
 # GoldenDict History Enhancer
 
-import random, json, os
+import random, json, os, sys
+
+file_dir = os.path.dirname(__file__)
+WORD_LIST_DIR = os.path.join(file_dir, 'voclist.txt')
+DAILY_WORDS_DIR = os.path.join(file_dir, 'daily_words.json')
+TEMP_HISTORY_DIR = os.path.join(file_dir, 'history')
+INDEX_DIR = os.path.join(file_dir, 'index.json')
+N = 24
+
 def generate_daily_word_list():
-    with open('voclist.txt') as f:
+    with open(WORD_LIST_DIR) as f:
         lines = f.readlines()
         lines = [line.rstrip('\n') for line in lines]
 
-    N = 24
     word_count = len(lines)
     random.shuffle(lines)
 
@@ -17,17 +24,18 @@ def generate_daily_word_list():
 
     daily_words = [lines[day * N: day * N + daily_len] for day, daily_len in enumerate(daily_lens)]
 
-    with open('daily_words.json', 'w') as f:
+    with open(DAILY_WORDS_DIR, 'w') as f:
         json.dump(daily_words, f)
 
 def current_history():
-    os.system('cp ~/.goldendict/history history')
-    with open('history') as f:
+    os.system(f'cp ~/.goldendict/history {TEMP_HISTORY_DIR}')
+    with open(TEMP_HISTORY_DIR) as f:
         lines = f.readlines()
+    os.system(f'rm {TEMP_HISTORY_DIR}')
     return lines
 
 def add_word_list(index):
-    with open('daily_words.json') as f:
+    with open(DAILY_WORDS_DIR) as f:
         daily_words = json.load(f)
     
     today_words = daily_words[index]
@@ -42,17 +50,17 @@ def add_word_list(index):
 
     os.system('killall goldendict')
     os.system('cp ~/.goldendict/history ~/.goldendict/history.bak')
-    with open('history', 'w') as f:
+    with open(TEMP_HISTORY_DIR, 'w') as f:
         f.writelines(history)
     
-    os.system('mv history ~/.goldendict/history')
+    os.system(f'mv {TEMP_HISTORY_DIR} ~/.goldendict/history')
             
 
 def update():
-    with open('index.json', 'r') as f:
+    with open(INDEX_DIR, 'r') as f:
         index = json.load(f)
     
-    with open('index.json', 'w') as f:
+    with open(INDEX_DIR, 'w') as f:
         index += 1
         add_word_list(index)
         json.dump(index, f)
@@ -60,14 +68,22 @@ def update():
 def undo():
     os.system('killall goldendict')
     os.system('mv ~/.goldendict/history.bak ~/.goldendict/history')
-    with open('index.json', 'r') as f:
+    with open(INDEX_DIR, 'r') as f:
         index = json.load(f)
-    with open('index.json', 'w') as f:
+    with open(INDEX_DIR, 'w') as f:
         index -= 1
         json.dump(index, f)
 
 
 if __name__ == '__main__':
+    if os.path.exists(DAILY_WORDS_DIR) == False:
+        s = input('Initialize? [Y/N] ')
+        if s in 'Yy':
+            generate_daily_word_list()
+        else:
+            print('Must Init before using this program!')
+            sys.exit(1)
+        
     s = input("Update GoldenDict history list? [Y/N] ")
     if s in 'Yy':
         update()
@@ -77,3 +93,4 @@ if __name__ == '__main__':
         if s in 'Yy':
             undo()
             print("Done!")
+
