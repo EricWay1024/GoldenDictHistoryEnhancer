@@ -9,6 +9,9 @@ WORD_LIST_DIR = os.path.join(file_dir, 'voclist.txt')
 DAILY_WORDS_DIR = os.path.join(file_dir, 'daily_words.json')
 TEMP_HISTORY_DIR = os.path.join(file_dir, 'history')
 INDEX_DIR = os.path.join(file_dir, 'index.json')
+GD_CONFIG_DIR = '~/.goldendict/'
+GD_HISTORY_DIR = os.path.join(GD_CONFIG_DIR, 'history')
+GD_HISTORY_BAK_DIR = os.path.join(GD_CONFIG_DIR, 'history.bak')
 N = 24
 
 def generate_daily_word_list():
@@ -28,7 +31,7 @@ def generate_daily_word_list():
         json.dump(daily_words, f)
 
 def current_history():
-    os.system(f'cp ~/.goldendict/history {TEMP_HISTORY_DIR}')
+    os.system(f'cp {GD_HISTORY_DIR} {TEMP_HISTORY_DIR}')
     with open(TEMP_HISTORY_DIR) as f:
         lines = f.readlines()
     os.system(f'rm {TEMP_HISTORY_DIR}')
@@ -49,11 +52,11 @@ def add_word_list(index):
             history.insert(0, word)
 
     os.system('killall goldendict')
-    os.system('cp ~/.goldendict/history ~/.goldendict/history.bak')
+    os.system(f'cp {GD_HISTORY_DIR} {GD_HISTORY_BAK_DIR}')
     with open(TEMP_HISTORY_DIR, 'w') as f:
         f.writelines(history)
     
-    os.system(f'mv {TEMP_HISTORY_DIR} ~/.goldendict/history')
+    os.system(f'mv {TEMP_HISTORY_DIR} {GD_HISTORY_DIR}')
             
 
 def update():
@@ -67,7 +70,7 @@ def update():
 
 def undo():
     os.system('killall goldendict')
-    os.system('mv ~/.goldendict/history.bak ~/.goldendict/history')
+    os.system(f'cp {GD_HISTORY_BAK_DIR} {GD_HISTORY_DIR}')
     with open(INDEX_DIR, 'r') as f:
         index = json.load(f)
     with open(INDEX_DIR, 'w') as f:
@@ -76,12 +79,23 @@ def undo():
 
 
 if __name__ == '__main__':
-    if os.path.exists(DAILY_WORDS_DIR) == False:
+    if not os.path.exists(DAILY_WORDS_DIR):
         s = input('Initialize? [Y/N] ')
         if s in 'Yy':
+
+            if not os.path.exists(WORD_LIST_DIR):
+                print(f'Please add a text file at {WORD_LIST_DIR} as your word list!')
+                sys.exit(1)
+            
+            s = input('How many words should be added to GodlenDict history each time? (Default: 24)\n')
+            if s != '':
+                N = int(s)
+
             generate_daily_word_list()
+            print('Initialization done!')
+
         else:
-            print('Must Init before using this program!')
+            print('Must Initialize before using this program!')
             sys.exit(1)
         
     s = input("Update GoldenDict history list? [Y/N] ")
