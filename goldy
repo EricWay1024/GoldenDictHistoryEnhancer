@@ -75,8 +75,8 @@ class LearnedList:
     @staticmethod
     def append(today_list):
         learned_list = LearnedList.get()
-        combined_list = LearnedList.get(combine=True)
-        today_list = [word for word in today_list if word not in combined_list]
+        # combined_list = LearnedList.get(combine=True)
+        # today_list = [word for word in today_list if word not in combined_list]
         learned_list.append(today_list)
         JSONVar.write('learned_list', learned_list)
 
@@ -108,6 +108,11 @@ class Markdown:
     @staticmethod
     def typora(index):
         md_file_dir = os.path.join(MD_DIR, f'{index}.md')
+        if not os.path.exists(md_file_dir):
+            print('File not exists. Create new.')
+            learned_list = LearnedList.get()
+            word_list = learned_list[index - 1]
+            Markdown.write(word_list, index)
         os.system(f'typora {md_file_dir}')
     
     @staticmethod
@@ -207,7 +212,7 @@ if __name__ == '__main__':
         notice = f'\n[f]  There is cached history for {cache_history}. You may want to finish it.\n'
 
     s = input(
-        'Welcome to Goldy\n'
+        'Welcome to Goldy.\n'
         '[l]  Learn\n'
         '[f]  Finish Learning/ Revision\n'
         '[n]  Note\n'
