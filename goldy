@@ -1,0 +1,281 @@
+#!/usr/bin/python3
+
+# GoldenDict History Enhancer
+
+import random, json, os, sys
+
+file_dir = os.path.dirname(__file__)
+WORD_LIST_DIR = os.path.join(file_dir, 'voclist.txt')
+DATA_DIR = os.path.join(file_dir, 'data.json')
+
+GD_CONFIG_DIR = '/home/eric/.goldendict/'
+GD_HISTORY_DIR = os.path.join(GD_CONFIG_DIR, 'history')
+GD_HISTORY_BAK_DIR = os.path.join(GD_CONFIG_DIR, 'history.bak')
+MD_DIR = '/home/eric/vocab/'
+N = 24
+
+class JSONVar:
+    @staticmethod
+    def get_data():
+        data = dict()
+        try:
+            with open(DATA_DIR) as f:
+                data = json.load(f)
+        except FileNotFoundError:
+                pass
+        return data
+
+    @staticmethod
+    def get(key, default=None):
+        data = JSONVar.get_data()
+        return data.get(key, default)
+    
+    @staticmethod
+    def write(key, value):
+        data = JSONVar.get_data()
+        data[key] = value
+        with open(DATA_DIR, 'w') as f:
+            json.dump(data, f)
+    
+    @staticmethod
+    def remove(key):
+        data = JSONVar.get_data()
+        del data[key]
+        with open(DATA_DIR, 'w') as f:
+            json.dump(data, f)
+
+
+class History:
+    @staticmethod
+    def write(word_list):
+        # Write a word list to history
+        new_history = [f"1 {word}\n" for word in word_list]
+        os.system('killall goldendict >/dev/null 2>&1')
+        os.system(f'cp {GD_HISTORY_DIR} {GD_HISTORY_BAK_DIR}')
+        with open(GD_HISTORY_DIR, 'w') as f:
+            f.writelines(new_history)
+
+    @staticmethod
+    def get():
+        with open(GD_HISTORY_DIR) as f:
+            lines = f.readlines()
+            word_list = [line.rstrip('\n').lstrip('1 ').lower() for line in lines]
+        return word_list
+
+
+class LearnedList:
+    @staticmethod
+    def get(combine=False):
+        learned_list = JSONVar.get('learned_list', [])
+        if not combine:
+            return learned_list
+        else:
+            return [word for words in learned_list for word in words]
+    
+    @staticmethod
+    def append(today_list):
+        learned_list = LearnedList.get()
+        combined_list = LearnedList.get(combine=True)
+        today_list = [word for word in today_list if word not in combined_list]
+        learned_list.append(today_list)
+        JSONVar.write('learned_list', learned_list)
+
+
+class WordList:
+    @staticmethod 
+    def get():
+        with open(WORD_LIST_DIR) as f:
+            lines = f.readlines()
+            complete_list = [line.rstrip('\n') for line in lines]
+        
+        learned_list = LearnedList.get(combine=True)
+        today_list = []
+        for _ in range(10000):
+            word = random.choice(complete_list)
+            if word not in learned_list and word not in today_list:
+                today_list.append(word)
+                if len(today_list) == N:
+                    break
+        
+        print(f'You have learned {len(learned_list)}/{len(complete_list)} words.')
+        print(f'The list today has {len(today_list)} words: ')
+        print(' '.join(today_list))
+
+        return today_list
+
+
+class Markdown:
+    @staticmethod
+    def typora(index):
+        md_file_dir = os.path.join(MD_DIR, f'{index}.md')
+        os.system(f'typora {md_file_dir}')
+    
+    @staticmethod
+    def write(word_list, index):
+        md_list = [f'## {word}' for word in word_list]
+        md_str =  f'# Word list {index}\n\n[TOC]\n\n' + '\n\n\n\n'.join(md_list)
+        md_file_dir = os.path.join(MD_DIR, f'{index}.md')
+        if os.path.exists(md_file_dir):
+            print(f'The path {md_file_dir} already exists.')
+            os.system(f'nautilus {MD_DIR}')
+            return
+        with open(md_file_dir, 'w') as f:
+            f.write(md_str)
+       
+
+class HistoryEnhancer:
+    @staticmethod
+    def learn():
+        today_list = WordList.get()
+        history_list = History.get()
+        JSONVar.write('history_list', history_list)
+        History.write(today_list)
+    
+    @staticmethod
+    def finish_learn():
+        today_list = History.get()
+        learned_list = LearnedList.get(combine=True)
+        today_list = [word for word in today_list if word not in learned_list]
+        LearnedList.append(today_list)
+        history_list = JSONVar.get('history_list')
+        if history_list is None:
+            print('No history to recover.')
+            sys.exit(1)
+        history_list = today_list + history_list
+        History.write(history_list)
+        JSONVar.remove('history_list')
+
+        learned_list = LearnedList.get()
+        Markdown.write(today_list, len(learned_list))
+    
+    @staticmethod
+    def revise(index):
+        history_list = History.get()
+        learned_list = LearnedList.get()
+        revise_list = learned_list[index - 1]
+        JSONVar.write('history_list', history_list)
+        History.write(revise_list)
+    
+    @staticmethod
+    def finish_revise():
+        history_list = JSONVar.get('history_list')
+        if history_list == None:
+            print('No history to recover.')
+            return 
+        History.write(history_list)
+        JSONVar.remove('history_list')
+
+def main_revise(index, d):
+    if d is not None and status[index - 1].get(str(d)) is not None:
+        return
+
+    s = input(f'Revise index {index}. Method: Notes/ Dict? [n/d]\n')
+    if s in 'Nn':
+        Markdown.typora(index)
+        
+    elif s in 'Dd':
+        cache_history = JSONVar.get('cache_history') 
+        if cache_history is not None:
+            print(f'Must finish last {cache_history}.')
+            sys.exit(1)
+        HistoryEnhancer.revise(index)
+        JSONVar.write('cache_history', 'revising')
+        s = input('Finish this revision? [y/n]\n')
+        if s in 'Yy':
+            HistoryEnhancer.finish_revise()
+            JSONVar.remove('cache_history')
+        else:
+            sys.exit(0)
+    
+    else:
+        print("Invalid input.")
+        sys.exit(1)
+    
+    status[index - 1][d] = 1 
+
+if __name__ == '__main__':
+    status = JSONVar.get('status')
+
+    if status is None:
+        status = []
+        JSONVar.write('learned_list', [])
+    
+    cache_history = JSONVar.get('cache_history') 
+    
+    notice = ''
+    if cache_history is not None:
+        notice = f'\n[f]  There is cached history for {cache_history}. You may want to finish it.\n'
+
+    s = input(
+        'Welcome to Goldy\n'
+        '[l]  Learn\n'
+        '[f]  Finish Learning/ Revision\n'
+        '[n]  Note\n'
+        '[r]  Revise\n'
+        '[s]  Status\n'
+        '[m]  Manual Revision\n'
+        '[e]  Exit \n' + notice)
+    
+    if s in 'Ll':
+        cache_history = JSONVar.get('cache_history') 
+        if cache_history is not None:
+            print(f'Must finish last {cache_history}.')
+            sys.exit(1)
+        HistoryEnhancer.learn()
+        status.append({})
+        JSONVar.write('cache_history', 'learning')
+    
+    elif s in 'Ff':
+        cache_history = JSONVar.get('cache_history') 
+        
+        if cache_history == None:
+            print('Must learn/ revise first.')
+            sys.exit(1)
+        elif cache_history == 'learning':
+            HistoryEnhancer.finish_learn()
+        else:
+            HistoryEnhancer.finish_revise()
+        
+        JSONVar.remove('cache_history')
+
+    
+    elif s in 'Nn':
+        if status == []:
+            print('Learn at least once before note.')
+            sys.exit(0)
+        print(f'Total notes: {len(status)}')
+        index = input('Please input the index (default = the last one): ')
+        if index == '':
+            index = len(status)
+        else:
+            index = int(index)
+        Markdown.typora(index)
+
+    
+    elif s in 'Rr':
+        for d in [1, 3, 6, 14]:
+            index = len(status) - d
+            if index >= 1:
+                main_revise(index, d)
+            else:
+                break      
+    
+    elif s in 'Ss':
+        print("Status:")
+        for index, st in enumerate(status, start=1):
+            print(f'Word list {index}: ', end='')
+            for d in [1, 3, 6, 14]:
+                if st.get(str(d)) is not None:
+                    print(d + 1, end=' ')
+                else:
+                    print('x', end=' ')
+            print()
+
+    elif s in 'Mm':
+        index = input('Input the index you want to revise: ')
+        index = int(index)
+        assert index > 0, 'index must be greater than 0'
+        main_revise(index, None)
+
+        
+    JSONVar.write('status', status)
