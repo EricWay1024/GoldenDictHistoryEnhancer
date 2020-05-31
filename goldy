@@ -275,7 +275,7 @@ if __name__ == '__main__':
         index = input('Input the index you want to revise: ')
         index = int(index)
         assert index > 0, 'index must be greater than 0'
-        main_revise(index, None)
+        main_revise(index, len(status) - index)
 
         
     JSONVar.write('status', status)
