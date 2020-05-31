@@ -1,27 +1,31 @@
-# GoldenDict History Enhancer
+[TOC]
 
-Add a list of new words to your GoldenDict history panel each time (so that you can remember them by reading explanations and example sentences in your dictionaries).
+## Learning on day 1 morning
 
-This Python program is developed on Arch Linux and is compatible with Unix machines.
+There is a list for every day. The default list is the automatically generated N words. These N words are generated at runtime. They will not include words that have appeared in past learning list, but may include those that have appeared in the history list (namely, the words you looked up for but did not formally learn).
 
-## Usage
+After first import in the morning, the history list will be only these N words. You should follow these steps:
 
-### Initialization
+1. You quickly go through the meanings of these words, listen to their pronunciation and try to memorize their basic meanings.
 
-*You may want to delete the `json` files before first usage.*
+2. You read the example sentences of each words to obtain a better understanding of these words.
+3. You watch the videos whose subtitles contain these words (on `youglish.com`) to further grasp the context where the words should be used whilst learning their pronunciation.
 
-1. Add your word list to `voclist.txt`. One word (or phrase) per line. The example `voclist.txt` is a GRE vocabulary list.
+In this process, you may find that some of the words are related with other words (including the ones you've learned before), or that some words are too easy for you. You edit the list accordingly. You may:
 
-2. Run `python3 gdhe` and follow the instructions.
+- Delete some of them
+- Change the order of them
+- Add related words
 
-NB: Your word list will be shuffled, cut into equal-length parts and stored in `daily_words.json`.
+After these steps, you should run the program again and it will save the current history list as today's new learning list. Then your complete history list should appear (including today's list), and you may use your GoldenDict as usual. 
 
-### Update or Undo Last Update
+## Revision on day 1 evening
 
-Run `python3 gdhe` and follow the instructions.
+Run the program in the evening and it will generate a Markdown file, where each new word in today's learning list becomes a 2-level title. You should try to make sentences using each of them (by recalling the sentences you've read and the videos you've watched). You may also briefly explain their meanings. After writing, you could open your GoldenDict to rectify possible mistakes. Save the file and this will be your learning notes.
 
-NB: `goldendict` process will be automatically killed during the update or undo. Restart it manually.
+## Revision on day 2, 4, 7, 15
 
-Your progress will be saved in `index.json`.
+Possible revision methods:
 
-You can undo only one step.
+1. Open your learning notes. Firstly only focus on the outline panel in Typora (that's the word list itself) and try to recall everything related to them. Then go through your notes.
+2. Replace temporarily the GoldenDict history list with the learning list of that day. However, any edition to the list here will be discarded. Then you can recover your complete history list after revision.
