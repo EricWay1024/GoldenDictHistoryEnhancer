@@ -169,16 +169,34 @@ class HistoryEnhancer:
             return 
         History.write(history_list)
         JSONVar.remove('history_list')
+    
+    @staticmethod
+    def notification():
+        cache_history = JSONVar.get('cache_history') 
+        notice = ''
+        if cache_history is not None:
+            notice = f'\n[f]  There is cached history for {cache_history}. You may want to finish it.\n'
 
-def main_revise(index, d):
-    if d is not None and status[index - 1].get(str(d)) is not None:
+        print(
+            'Welcome to Goldy.\n'
+            '[l]  Learn\n'
+            '[f]  Finish Learning/Revision\n'
+            '[n]  Note\n'
+            '[r]  Revise\n'
+            '[s]  Status\n'
+            '[m]  Manual Revision\n'
+            '[p]  Play with Learned Words\n'
+            '[e]  Exit \n' + notice)
+
+def main_revise(index, d, manual=False):
+    if not manual and d is not None and status[index - 1].get(str(d)) is not None:
         return
 
     s = input(f'Revise index {index}. Method: Notes/ Dict? [n/d]\n')
-    if s in 'Nn':
+    if s == 'n':
         Markdown.typora(index)
         
-    elif s in 'Dd':
+    elif s == 'd':
         cache_history = JSONVar.get('cache_history') 
         if cache_history is not None:
             print(f'Must finish last {cache_history}.')
@@ -199,88 +217,95 @@ def main_revise(index, d):
     status[index - 1][d] = 1 
 
 if __name__ == '__main__':
-    status = JSONVar.get('status')
 
-    if status is None:
-        status = []
-        JSONVar.write('learned_list', [])
+    HistoryEnhancer.notification()
     
-    cache_history = JSONVar.get('cache_history') 
-    
-    notice = ''
-    if cache_history is not None:
-        notice = f'\n[f]  There is cached history for {cache_history}. You may want to finish it.\n'
-
-    s = input(
-        'Welcome to Goldy.\n'
-        '[l]  Learn\n'
-        '[f]  Finish Learning/ Revision\n'
-        '[n]  Note\n'
-        '[r]  Revise\n'
-        '[s]  Status\n'
-        '[m]  Manual Revision\n'
-        '[e]  Exit \n' + notice)
-    
-    if s in 'Ll':
-        cache_history = JSONVar.get('cache_history') 
-        if cache_history is not None:
-            print(f'Must finish last {cache_history}.')
-            sys.exit(1)
-        HistoryEnhancer.learn()
-        status.append({})
-        JSONVar.write('cache_history', 'learning')
-    
-    elif s in 'Ff':
-        cache_history = JSONVar.get('cache_history') 
+    while True:
+        try:
+            s = input('GOLDY >> ')
+        except EOFError:
+            print('\nBye!')
+            break
+        status = JSONVar.get('status')
+        if status is None:
+            status = []
+            JSONVar.write('learned_list', [])
         
-        if cache_history == None:
-            print('Must learn/ revise first.')
-            sys.exit(1)
-        elif cache_history == 'learning':
-            HistoryEnhancer.finish_learn()
-        else:
-            HistoryEnhancer.finish_revise()
+        if s == 'l':
+            cache_history = JSONVar.get('cache_history') 
+            if cache_history is not None:
+                print(f'Must finish last {cache_history}.')
+                sys.exit(1)
+            HistoryEnhancer.learn()
+            status.append({})
+            JSONVar.write('cache_history', 'learning')
         
-        JSONVar.remove('cache_history')
-
-    
-    elif s in 'Nn':
-        if status == []:
-            print('Learn at least once before note.')
-            sys.exit(0)
-        print(f'Total notes: {len(status)}')
-        index = input('Please input the index (default = the last one): ')
-        if index == '':
-            index = len(status)
-        else:
-            index = int(index)
-        Markdown.typora(index)
-
-    
-    elif s in 'Rr':
-        for d in [1, 3, 6, 14]:
-            index = len(status) - d
-            if index >= 1:
-                main_revise(index, d)
+        elif s == 'f':
+            cache_history = JSONVar.get('cache_history') 
+            
+            if cache_history == None:
+                print('Must learn/ revise first.')
+                sys.exit(1)
+            elif cache_history == 'learning':
+                HistoryEnhancer.finish_learn()
             else:
-                break      
-    
-    elif s in 'Ss':
-        print("Status:")
-        for index, st in enumerate(status, start=1):
-            print(f'Word list {index}: ', end='')
-            for d in [1, 3, 6, 14]:
-                if st.get(str(d)) is not None:
-                    print(d + 1, end=' ')
-                else:
-                    print('x', end=' ')
-            print()
-
-    elif s in 'Mm':
-        index = input('Input the index you want to revise: ')
-        index = int(index)
-        assert index > 0, 'index must be greater than 0'
-        main_revise(index, len(status) - index)
+                HistoryEnhancer.finish_revise()
+            
+            JSONVar.remove('cache_history')
 
         
-    JSONVar.write('status', status)
+        elif s == 'n':
+            if status == []:
+                print('Learn at least once before note.')
+                sys.exit(0)
+            print(f'Total notes: {len(status)}')
+            index = input('Please input the index (default = the last one): ')
+            if index == '':
+                index = len(status)
+            else:
+                index = int(index)
+            Markdown.typora(index)
+
+        
+        elif s == 'r':
+            for d in [1, 3, 6, 14]:
+                index = len(status) - d
+                if index >= 1:
+                    main_revise(index, d)
+                else:
+                    break      
+        
+        elif s == 's':
+            print("Status:")
+            for index, st in enumerate(status, start=1):
+                print(f'Word list {index}: ', end='')
+                for d in [1, 3, 6, 14]:
+                    if st.get(str(d)) is not None:
+                        print(d + 1, end=' ')
+                    else:
+                        print('x', end=' ')
+                print()
+
+        elif s == 'm':
+            index = input('Input the index you want to revise: ')
+            index = int(index)
+            assert index > 0, 'index must be greater than 0'
+            main_revise(index, len(status) - index, manual=True)
+        
+        elif s == 'e':
+            break
+
+        elif s == 'p':
+            learned_list = LearnedList.get(combine=True)
+            while learned_list:
+                random_word = random.choice(learned_list)
+                learned_list.remove(random_word)
+                print(f"{random_word}")
+                t = input()
+                if t == 'q':
+                    break
+        else:
+            HistoryEnhancer.notification()
+
+            
+        JSONVar.write('status', status)
