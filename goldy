@@ -89,13 +89,16 @@ class WordList:
             complete_list = [line.rstrip('\n') for line in lines]
         
         learned_list = LearnedList.get(combine=True)
+        deleted_list = JSONVar.get('deleted_list', [])
         today_list = []
         for _ in range(10000):
             word = random.choice(complete_list)
-            if word not in learned_list and word not in today_list:
+            if word not in learned_list + today_list + deleted_list:
                 today_list.append(word)
                 if len(today_list) == N:
                     break
+        
+        JSONVar.write('today_old_list', today_list)
         
         print(f'You have learned {len(learned_list)}/{len(complete_list)} words.')
         print(f'The list today has {len(today_list)} words: ')
@@ -139,6 +142,11 @@ class HistoryEnhancer:
     @staticmethod
     def finish_learn():
         today_list = History.get()
+
+        today_old_list = JSONVar.get('today_old_list', [])
+        deleted_list = [word for word in today_old_list if word not in today_list] + JSONVar.get('deleted_list', [])
+        JSONVar.write('deleted_list', deleted_list)
+
         learned_list = LearnedList.get(combine=True)
         today_list = [word for word in today_list if word not in learned_list]
         LearnedList.append(today_list)
