@@ -12,7 +12,7 @@ GD_CONFIG_DIR = '/home/eric/.goldendict/'
 GD_HISTORY_DIR = os.path.join(GD_CONFIG_DIR, 'history')
 GD_HISTORY_BAK_DIR = os.path.join(GD_CONFIG_DIR, 'history.bak')
 MD_DIR = '/home/eric/vocab/'
-N = 24
+N = 30
 
 class JSONVar:
     @staticmethod
@@ -287,11 +287,9 @@ if __name__ == '__main__':
             print("Status:")
             for index, st in enumerate(status, start=1):
                 print(f'Word list {index}: ', end='')
-                for d in [1, 3, 6, 14]:
+                for d in range(100):
                     if st.get(str(d)) is not None:
                         print(d + 1, end=' ')
-                    else:
-                        print('x', end=' ')
                 print()
 
         elif s == 'm':
@@ -312,6 +310,15 @@ if __name__ == '__main__':
                 t = input()
                 if t == 'q':
                     break
+        elif s[0] == 'S':
+            with open(WORD_LIST_DIR) as f:
+                lines = f.readlines()
+                word_list = [line.rstrip('\n') for line in lines]
+            word = s.split()[1]
+            if word in word_list:
+                print(f'{word} is in the word list.')
+            else:
+                print(f'{word} is not in the word list.')
         else:
             HistoryEnhancer.notification()
 
