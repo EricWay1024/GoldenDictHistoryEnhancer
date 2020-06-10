@@ -194,6 +194,7 @@ class HistoryEnhancer:
             '[s]  Status\n'
             '[m]  Manual Revision\n'
             '[p]  Play with Learned Words\n'
+            '[S]  Search a word\n'
             '[e]  Exit \n' + notice)
 
 def main_revise(index, d, manual=False):
