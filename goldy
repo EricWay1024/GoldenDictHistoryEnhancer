@@ -2,16 +2,17 @@
 
 # GoldenDict History Enhancer
 
-import random, json, os, sys
+import random, json, os, sys, pathlib
 
 file_dir = os.path.dirname(__file__)
+home_dir = str(pathlib.Path.home())
 WORD_LIST_DIR = os.path.join(file_dir, 'voclist.txt')
 DATA_DIR = os.path.join(file_dir, 'data.json')
 
-GD_CONFIG_DIR = '/home/eric/.goldendict/'
+GD_CONFIG_DIR = os.path.join(home_dir, '.goldendict')
 GD_HISTORY_DIR = os.path.join(GD_CONFIG_DIR, 'history')
 GD_HISTORY_BAK_DIR = os.path.join(GD_CONFIG_DIR, 'history.bak')
-MD_DIR = '/home/eric/vocab/'
+MD_DIR = os.path.join(home_dir, 'vocab')
 N = 30
 
 class JSONVar:
@@ -35,7 +36,7 @@ class JSONVar:
         data = JSONVar.get_data()
         data[key] = value
         with open(DATA_DIR, 'w') as f:
-            json.dump(data, f)
+            json.dump(data, f, indent=2)
     
     @staticmethod
     def remove(key):
