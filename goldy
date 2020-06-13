@@ -155,7 +155,7 @@ class HistoryEnhancer:
 
         today_old_list = JSONVar.get('today_old_list', [])
         JSONVar.remove('today_old_list')
-        
+
         deleted_list = [word for word in today_old_list if word not in today_list] + JSONVar.get('deleted_list', [])
         JSONVar.write('deleted_list', deleted_list)
 
@@ -280,7 +280,7 @@ if __name__ == '__main__':
                 print('Learn at least once before note.')
                 sys.exit(0)
             print(f'Total notes: {len(status)}')
-            index = input('Please input the index (default = the last one): ')
+            index = input('Please input the index (default: the latest): ')
             if index == '':
                 index = len(status)
             else:
@@ -341,12 +341,18 @@ if __name__ == '__main__':
             with open(WORD_LIST_DIR) as f:
                 lines = f.readlines()
                 word_list = [line.rstrip('\n') for line in lines]
+            learned_list = LearnedList.get(combine=True)
             try:
                 word = s.split()[1]
                 if word in word_list:
                     print(f'{word} is in the word list.')
                 else:
                     print(f'{word} is not in the word list.')
+                
+                if word in learned_list:
+                    print(f'You have learned {word}.')
+                else:
+                    print(f'You have not learned {word}.')
             
             except IndexError:
                 print('Syntax: S [word]')
