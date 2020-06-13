@@ -3,6 +3,7 @@
 # GoldenDict History Enhancer
 
 import random, json, os, sys, pathlib
+from google_api import get_example_sentences
 
 file_dir = os.path.dirname(__file__)
 home_dir = str(pathlib.Path.home())
@@ -84,7 +85,7 @@ class LearnedList:
 
 class WordList:
     @staticmethod 
-    def get():
+    def get(history_list=[]):
         with open(WORD_LIST_DIR) as f:
             lines = f.readlines()
             complete_list = [line.rstrip('\n') for line in lines]
@@ -92,12 +93,20 @@ class WordList:
         learned_list = LearnedList.get(combine=True)
         deleted_list = JSONVar.get('deleted_list', [])
         today_list = []
+
+        def add_to_today_list(word):
+            if len(today_list) < N and word not in learned_list + today_list + deleted_list and word in complete_list:
+                today_list.append(word)
+            return len(today_list) < N
+
+        for word in history_list:
+            if not add_to_today_list(word):
+                break
+            
         for _ in range(10000):
             word = random.choice(complete_list)
-            if word not in learned_list + today_list + deleted_list:
-                today_list.append(word)
-                if len(today_list) == N:
-                    break
+            if not add_to_today_list(word):
+                break
         
         JSONVar.write('today_old_list', today_list)
         
@@ -135,9 +144,9 @@ class Markdown:
 class HistoryEnhancer:
     @staticmethod
     def learn():
-        today_list = WordList.get()
         history_list = History.get()
         JSONVar.write('history_list', history_list)
+        today_list = WordList.get(history_list)
         History.write(today_list)
     
     @staticmethod
@@ -145,6 +154,8 @@ class HistoryEnhancer:
         today_list = History.get()
 
         today_old_list = JSONVar.get('today_old_list', [])
+        JSONVar.remove('today_old_list')
+        
         deleted_list = [word for word in today_old_list if word not in today_list] + JSONVar.get('deleted_list', [])
         JSONVar.write('deleted_list', deleted_list)
 
@@ -287,8 +298,10 @@ if __name__ == '__main__':
         
         elif s == 's':
             print("Status:")
+            learned_list = LearnedList.get(combine=True)
+            print(f'You have learned {len(learned_list)} words.')
             for index, st in enumerate(status, start=1):
-                print(f'Word list {index}: ', end='')
+                print(f'Word list {index}:\t', end='')
                 for d in range(100):
                     if st.get(str(d)) is not None:
                         print(d + 1, end=' ')
@@ -304,23 +317,40 @@ if __name__ == '__main__':
             break
 
         elif s == 'p':
+            print('Learned words will be randomly generated one at a time. \nFor each word, input x to show its example sentences. \nInput nothing for the next word. \nInput e to exit.\n')
             learned_list = LearnedList.get(combine=True)
             while learned_list:
                 random_word = random.choice(learned_list)
                 learned_list.remove(random_word)
                 print(f"{random_word}")
-                t = input()
-                if t == 'q':
+                try:
+                    t = input()
+                except EOFError:
                     break
+                if t == 'q' or t == 'e':
+                    break
+                elif t == 'x':
+                    try:
+                        example_sentences = get_example_sentences(random_word)
+                        print('\n'.join(example_sentences))
+                    except RuntimeError:
+                        print('API Failure')
+                    
+                    print()
         elif s[0] == 'S':
             with open(WORD_LIST_DIR) as f:
                 lines = f.readlines()
                 word_list = [line.rstrip('\n') for line in lines]
-            word = s.split()[1]
-            if word in word_list:
-                print(f'{word} is in the word list.')
-            else:
-                print(f'{word} is not in the word list.')
+            try:
+                word = s.split()[1]
+                if word in word_list:
+                    print(f'{word} is in the word list.')
+                else:
+                    print(f'{word} is not in the word list.')
+            
+            except IndexError:
+                print('Syntax: S [word]')
+            
         else:
             HistoryEnhancer.notification()
 
