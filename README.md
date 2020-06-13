@@ -1,5 +1,13 @@
 # How to Use Goldy
 
+## Requirements
+
+Unix machine
+
+GoldenDict
+
+Typora
+
 ## Learning on day 1 morning
 
 There is a list for every day. The default list is the automatically generated N words. These N words are generated at runtime. They will not include words that have appeared in past learning list, but will include those that have appeared in the history list (namely, the words you looked up for but did not formally learn). In fact, these words will be given a higher priority when the list is generated.
