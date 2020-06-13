@@ -14,7 +14,7 @@ GD_CONFIG_DIR = os.path.join(home_dir, '.goldendict')
 GD_HISTORY_DIR = os.path.join(GD_CONFIG_DIR, 'history')
 GD_HISTORY_BAK_DIR = os.path.join(GD_CONFIG_DIR, 'history.bak')
 MD_DIR = os.path.join(home_dir, 'vocab')
-N = 30
+N = 35
 
 class JSONVar:
     @staticmethod
@@ -166,6 +166,13 @@ class HistoryEnhancer:
         if history_list is None:
             print('No history to recover.')
             sys.exit(1)
+        
+        for word in today_list:
+            try:
+                history_list.remove(word)
+            except ValueError:
+                pass
+        
         history_list = today_list + history_list
         History.write(history_list)
         JSONVar.remove('history_list')
