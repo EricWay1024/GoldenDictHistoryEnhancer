@@ -1,4 +1,4 @@
-[TOC]
+# How to Use Goldy
 
 ## Learning on day 1 morning
 
