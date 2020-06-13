@@ -2,7 +2,7 @@
 
 ## Learning on day 1 morning
 
-There is a list for every day. The default list is the automatically generated N words. These N words are generated at runtime. They will not include words that have appeared in past learning list, but may include those that have appeared in the history list (namely, the words you looked up for but did not formally learn).
+There is a list for every day. The default list is the automatically generated N words. These N words are generated at runtime. They will not include words that have appeared in past learning list, but will include those that have appeared in the history list (namely, the words you looked up for but did not formally learn). In fact, these words will be given a higher priority when the list is generated.
 
 After first import in the morning, the history list will be only these N words. You should follow these steps:
 
@@ -29,3 +29,10 @@ Possible revision methods:
 
 1. Open your learning notes. Firstly only focus on the outline panel in Typora (that's the word list itself) and try to recall everything related to them. Then go through your notes.
 2. Replace temporarily the GoldenDict history list with the learning list of that day. However, any edition to the list here will be discarded. Then you can recover your complete history list after revision.
+
+## Other Features
+
+1. Check your learninng and revision status.
+2. Revise any word list you manually specify.
+3. Play with learned words. The program will randomly generate one learned word at a time. Try to quickly recall its meaning and move on to the next. If you have difficulty with a word, the program can provide its example sentences as a hint.
+4. Search a word in your complete vocabulary list and your learned list.
