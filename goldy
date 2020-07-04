@@ -14,7 +14,7 @@ GD_CONFIG_DIR = os.path.join(home_dir, '.goldendict')
 GD_HISTORY_DIR = os.path.join(GD_CONFIG_DIR, 'history')
 GD_HISTORY_BAK_DIR = os.path.join(GD_CONFIG_DIR, 'history.bak')
 MD_DIR = os.path.join(home_dir, 'vocab')
-N = 35
+N = 40
 
 class JSONVar:
     @staticmethod
@@ -259,7 +259,9 @@ if __name__ == '__main__':
             status = []
             JSONVar.write('learned_list', [])
         
-        if s == 'l':
+        if s == 'l' or (len(s) > 0 and s[0] == 'l'):
+            if s != 'l':
+                N = int(s.split()[1])
             cache_history = JSONVar.get('cache_history') 
             if cache_history is not None:
                 print(f'Must finish last {cache_history}.')
@@ -344,7 +346,7 @@ if __name__ == '__main__':
                         print('API Failure')
                     
                     print()
-        elif s[0] == 'S':
+        elif len(s) > 0 and s[0] == 'S':
             with open(WORD_LIST_DIR) as f:
                 lines = f.readlines()
                 word_list = [line.rstrip('\n') for line in lines]
