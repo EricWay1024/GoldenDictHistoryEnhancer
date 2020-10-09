@@ -214,6 +214,7 @@ class HistoryEnhancer:
             '[m]  Manual Revision\n'
             '[p]  Play with Learned Words\n'
             '[S]  Search a word\n'
+            '[g]  Push to Git\n'
             '[e]  Exit \n' + notice)
 
 def main_revise(index, d, manual=False):
@@ -372,10 +373,6 @@ if __name__ == '__main__':
             learned_list = LearnedList.get()
             n = len(learned_list)
             os.system(f'cd {file_dir}; git add .; git commit -m "word list {n}"; git push; cd -')
-            # os.system(f'git add .')
-            # os.system(f'git commit -m "word list {n}"')
-            # os.system(f'git push')
-            # os.system('cd -')
             
         else:
             HistoryEnhancer.notification()
