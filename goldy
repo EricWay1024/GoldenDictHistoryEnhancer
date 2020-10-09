@@ -14,7 +14,7 @@ GD_CONFIG_DIR = os.path.join(home_dir, '.goldendict')
 GD_HISTORY_DIR = os.path.join(GD_CONFIG_DIR, 'history')
 GD_HISTORY_BAK_DIR = os.path.join(GD_CONFIG_DIR, 'history.bak')
 MD_DIR = os.path.join(home_dir, 'vocab')
-N = 40
+N = 25
 
 class JSONVar:
     @staticmethod
@@ -308,7 +308,9 @@ if __name__ == '__main__':
         elif s == 's':
             print("Status:")
             learned_list = LearnedList.get(combine=True)
+            deleted_list = JSONVar.get('deleted_list')
             print(f'You have learned {len(learned_list)} words.')
+            print(f'You have deleted {len(deleted_list)} words.')
             for index, st in enumerate(status, start=1):
                 print(f'Word list {index}:\t', end='')
                 for d in range(100):
@@ -365,6 +367,15 @@ if __name__ == '__main__':
             
             except IndexError:
                 print('Syntax: S [word]')
+        
+        elif s == 'g':
+            learned_list = LearnedList.get()
+            n = len(learned_list)
+            os.system(f'cd {file_dir}; git add .; git commit -m "word list {n}"; git push; cd -')
+            # os.system(f'git add .')
+            # os.system(f'git commit -m "word list {n}"')
+            # os.system(f'git push')
+            # os.system('cd -')
             
         else:
             HistoryEnhancer.notification()
