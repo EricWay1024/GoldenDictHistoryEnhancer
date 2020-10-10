@@ -373,6 +373,7 @@ if __name__ == '__main__':
             learned_list = LearnedList.get()
             n = len(learned_list)
             os.system(f'cd {file_dir}; git add .; git commit -m "word list {n}"; git push; cd -')
+            os.system(f'cd {MD_DIR}; git add .; git commit -m "word list {n}"; git push; cd -')
             
         else:
             HistoryEnhancer.notification()
