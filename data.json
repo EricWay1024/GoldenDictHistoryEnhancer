@@ -1575,6 +1575,30 @@
       "correlation",
       "distressing",
       "misanthropy"
+    ],
+    [
+      "conviction",
+      "mire",
+      "incipient",
+      "tactless",
+      "impediment",
+      "soporific",
+      "facade",
+      "moratorium",
+      "rigorous",
+      "affability",
+      "laudatory",
+      "particularize",
+      "portentous",
+      "alloy",
+      "dilatory",
+      "magnify",
+      "enigmatic",
+      "visionary",
+      "perennial",
+      "trenchant",
+      "chivalrous",
+      "aberrant"
     ]
   ],
   "status": [
@@ -1846,9 +1870,13 @@
     {
       "1": 1
     },
+    {},
     {}
   ],
   "deleted_list": [
+    "celebrated",
+    "idol",
+    "resource",
     "incentive",
     "qualify",
     "contest",
