@@ -1734,6 +1734,54 @@
       "introspection",
       "capricious",
       "contagious"
+    ],
+    [
+      "perquisite",
+      "perk",
+      "rancour",
+      "surge",
+      "canned",
+      "feeble",
+      "novice",
+      "deter",
+      "delegate",
+      "bucolic",
+      "halt",
+      "denigrate",
+      "incongruity",
+      "speculate",
+      "exasperate",
+      "quell",
+      "utopian",
+      "rancor",
+      "orthodoxy",
+      "affiliation"
+    ],
+    [
+      "phoney",
+      "complement",
+      "intoxicate",
+      "taxing",
+      "temperance",
+      "dissimulate",
+      "obligatory",
+      "phony",
+      "florid",
+      "humble",
+      "outgrowth",
+      "illuminate",
+      "abnegate",
+      "solicit",
+      "emerging",
+      "compliance",
+      "intrepid",
+      "stymie",
+      "parsimonious",
+      "accrue",
+      "originate",
+      "conflate",
+      "daunting",
+      "measured"
     ]
   ],
   "status": [
@@ -1996,7 +2044,8 @@
     {
       "1": 1,
       "3": 1,
-      "6": 1
+      "6": 1,
+      "14": 1
     },
     {
       "1": 1,
@@ -2032,7 +2081,8 @@
     },
     {
       "1": 1,
-      "3": 1
+      "3": 1,
+      "6": 1
     },
     {
       "3": 1
@@ -2040,12 +2090,26 @@
     {
       "1": 1
     },
+    {
+      "1": 1,
+      "3": 1
+    },
+    {},
     {
       "1": 1
     },
     {}
   ],
   "deleted_list": [
+    "consecutive",
+    "participation",
+    "formal",
+    "maturity",
+    "identical",
+    "confuse",
+    "disrupt",
+    "grateful",
+    "sophistication",
     "fine",
     "marginal",
     "abstract",
